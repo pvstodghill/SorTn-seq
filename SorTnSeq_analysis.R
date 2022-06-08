@@ -6,8 +6,17 @@ library(scales)
 library(ggrepel)
 library(ggiraph)
 
+library(optparse)
+
+parser <- OptionParser(usage = "%prog [options] prefix")
+args <- parse_args(parser,
+                   positional_arguments = 1,
+                   print_help_and_exit = TRUE)
+
+genome.prefix <- args$args[1]
+
 # variables
-  genome.prefix<-"GCF_002847015.1_ASM284701v1"
+  ##genome.prefix<-"GCF_002847015.1_ASM284701v1"
   read.cutoff.depleted<-2 # only consider features that have > x insertions in ALL DEPLETED samples - could be an issue if the depleted pool isn't sampled deep
   bcv.features<-100
   reference.sample<-"depleted"

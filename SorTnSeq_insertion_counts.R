@@ -2,20 +2,38 @@ library(tidyverse)
 library(readxl)
 library(writexl)
 
+library(optparse)
+
+parser <- OptionParser(usage = "%prog [options] prefix metadata.xlsx bam_dir")
+args <- parse_args(parser,
+                   positional_arguments = 3,
+                   print_help_and_exit = TRUE)
+
+genome.prefix <- args$args[1]
+sample.metadata.file <- args$args[2]
+bam.dir <- args$args[3]
+
 # variables
-  genome.prefix<-"GCF_002847015.1_ASM284701v1" # Please update for your target genome
+  ##genome.prefix<-"GCF_002847015.1_ASM284701v1" # Please update for your target genome
   trim.3.prime<-0.1 # Proportion of the 3' end of features (non-intergenic) to exclude for read counting
   trim.5.prime<-0.1 # Proportion of the 5' end of features (non-intergenic) to exclude for read counting
 
 # read in the sample data
-  sample.metadata<-read_xlsx("sample_metadata.xlsx")%>%
+  sample.metadata<-read_xlsx(sample.metadata.file)%>%
                             mutate(sample.name=paste(sample.type,replicate,sep="_"))
 
 for (sample in 1:nrow(sample.metadata)){
   print(paste0("Processing sample #",sample,": ",sample.metadata[sample,1]))
     
 # Read the specified file
-  data<-read_delim(Sys.glob(file.path(paste0("bam/",sample.metadata$plot.file.prefix[sample],"*",".mapped.bam.bed"))),
+  bam.glob <- file.path(paste0(bam.dir,"/",sample.metadata$plot.file.prefix[sample],"*",".mapped.bam.bed"))
+  bam.files <- Sys.glob(bam.glob)
+  if (length(bam.files) == 0) {
+      stop("No matching file: ", bam.glob)
+  } else if (length(bam.files) > 1) {
+      stop("Matches multiple files: ", bam.glob)
+  }
+  data<-read_delim(bam.files[1],
                     delim="\t", 
                     col_names=c("seqid",
                                 "start",

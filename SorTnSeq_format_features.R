@@ -2,7 +2,9 @@ library(tidyverse)
 library(readxl)
 library(writexl)
 
-file.prefix<-"GCF_002847015.1_ASM284701v1"  # Please update for your target genome
+library(optparse)
+
+## file.prefix<-"GCF_002847015.1_ASM284701v1"  # Please update for your target genome
 
 generate_feature_table<-function(file.prefix){
   
@@ -174,7 +176,13 @@ features.in<-gff.refseq%>%
   features.sortnseq%>%write_xlsx(paste0(file.prefix,"_features_sortnseq.xlsx"))
 }
 
-generate_feature_table(file.prefix)
+parser <- OptionParser(usage = "%prog [options] prefix")
+args <- parse_args(parser,
+                   positional_arguments = 1,
+                   print_help_and_exit = TRUE)
+
+
+generate_feature_table(args$args)
 
 
 
