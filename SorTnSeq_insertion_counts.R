@@ -4,7 +4,7 @@ library(writexl)
 
 library(optparse)
 
-parser <- OptionParser(usage = "%prog [options] prefix metadata.xlsx bam_dir")
+parser <- OptionParser(usage = "%prog [options] prefix metadata bam_dir")
 args <- parse_args(parser,
                    positional_arguments = 3,
                    print_help_and_exit = TRUE)
@@ -18,9 +18,16 @@ bam.dir <- args$args[3]
   trim.3.prime<-0.1 # Proportion of the 3' end of features (non-intergenic) to exclude for read counting
   trim.5.prime<-0.1 # Proportion of the 5' end of features (non-intergenic) to exclude for read counting
 
-# read in the sample data
-  sample.metadata<-read_xlsx(sample.metadata.file)%>%
-                            mutate(sample.name=paste(sample.type,replicate,sep="_"))
+  # read in the sample data
+  if (grepl("\\.xlsx$", sample.metadata.file)) {
+      sample.metadata <- read_xlsx(sample.metadata.file)
+  } else if (grepl("\\.tsv$", sample.metadata.file)) {
+      sample.metadata <- read_delim(sample.metadata.file)
+  } else {
+      stop("Unimplemented file type: ", sample.metadata.file)
+  }
+  sample.metadata <- sample.metadata%>%
+      mutate(sample.name=paste(sample.type,replicate,sep="_"))
 
 for (sample in 1:nrow(sample.metadata)){
   print(paste0("Processing sample #",sample,": ",sample.metadata[sample,1]))
