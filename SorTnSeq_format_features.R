@@ -151,8 +151,8 @@ features.in<-gff.refseq%>%
                       mutate(attributes=paste(attribute,collapse=";"))%>%
                       ungroup()%>%
                       select(-attribute)%>%
-                      distinct()%>%
-                      mutate(phase=replace_na(phase,0))
+                      distinct()###%>%
+                      ###mutate(phase=replace_na(phase,0))
     
   features.gff%>%write_delim(paste0(file.prefix,"_features_sortnseq.gff"),delim="\t",col_names=F)  
 
